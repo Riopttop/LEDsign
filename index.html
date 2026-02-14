@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쉬운 전광판 만들기</title>
+    <style>
+        /* [모듈 1: 디자인 세팅] */
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --font-size: 100px;
+            --speed: 10s;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 설정 창 영역 */
+        #ui-panel {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label { font-weight: bold; font-size: 14px; color: #555; }
+        
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* [모듈 2: 전광판 실행 영역] */
+        #display-area {
+            flex: 1;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        #marquee-text {
+            position: absolute;
+            white-space: nowrap;
+            color: var(--text-color);
+            font-size: var(--font-size);
+            font-weight: bold;
+            will-change: transform;
+            animation: move-left var(--speed) linear infinite;
+        }
+
+        @keyframes move-left {
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* 전체화면 버튼 */
+        #fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-panel">
+        <div class="control-group">
+            <label>📝 보여줄 글자</label>
+            <input type="text" id="input-text" placeholder="내용을 입력하세요" value="여기에 글자를 쓰세요">
+        </div>
+        <div class="control-group">
+            <label>🎨 글자 색깔</label>
+            <input type="color" id="input-text-color" value="#ffffff">
+        </div>
+        <div class="control-group">
+            <label>⬛ 배경 색깔</label>
+            <input type="color" id="input-bg-color" value="#000000">
+        </div>
+        <div class="control-group">
+            <label>📏 글자 크기</label>
+            <input type="range" id="input-size" min="50" max="300" value="150">
+        </div>
+        <div class="control-group">
+            <label>⚡ 흘러가는 속도 (작을수록 빠름)</label>
+            <input type="range" id="input-speed" min="2" max="30" value="10" step="1">
+        </div>
+        <div class="control-group">
+            <label>🔤 글씨체</label>
+            <select id="input-font">
+                <option value="sans-serif">기본 고딕</option>
+                <option value="serif">명조체</option>
+                <option value="cursive">손글씨체</option>
+                <option value="'Courier New', monospace">타자기체</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="display-area">
+        <div id="marquee-text">여기에 글자를 쓰세요</div>
+    </div>
+
+    <button id="fullscreen-btn" onclick="toggleUI()">⚙️ 설정창 숨기기/보이기</button>
+
+    <script>
+        /* [모듈 3: 독립적 로직 제어] */
+        const textElement = document.getElementById('marquee-text');
+        const displayArea = document.getElementById('display-area');
+        const uiPanel = document.getElementById('ui-panel');
+
+        // 1. 글자 변경 모듈
+        document.getElementById('input-text').addEventListener('input', (e) => {
+            textElement.innerText = e.target.value || ' ';
+        });
+
+        // 2. 글자 색상 모듈
+        document.getElementById('input-text-color').addEventListener('input', (e) => {
+            textElement.style.color = e.target.value;
+        });
+
+        // 3. 배경 색상 모듈
+        document.getElementById('input-bg-color').addEventListener('input', (e) => {
+            displayArea.style.backgroundColor = e.target.value;
+        });
+
+        // 4. 글자 크기 모듈
+        document.getElementById('input-size').addEventListener('input', (e) => {
+            textElement.style.fontSize = e.target.value + 'px';
+        });
+
+        // 5. 속도 제어 모듈
+        document.getElementById('input-speed').addEventListener('input', (e) => {
+            // 속도 값이 낮을수록 빨라지므로 역산 느낌으로 처리
+            textElement.style.animationDuration = e.target.value + 's';
+        });
+
+        // 6. 폰트 변경 모듈
+        document.getElementById('input-font').addEventListener('change', (e) => {
+            textElement.style.fontFamily = e.target.value;
+        });
+
+        // UI 숨기기 기능 (어르신들이 전광판만 보고 싶을 때)
+        function toggleUI() {
+            if (uiPanel.style.display === 'none') {
+                uiPanel.style.display = 'grid';
+            } else {
+                uiPanel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
