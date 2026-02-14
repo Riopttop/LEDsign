@@ -8,13 +8,13 @@
         :root {
             --bg-color: #000000;
             --text-color: #ffff00;
-            --font-size: 250px;
+            --font-size: 150px;
             --speed-val: 10s;
         }
 
         body {
             margin: 0;
-            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            font-family: 'Pretendard', sans-serif;
             background-color: #f0f2f5;
             display: flex;
             flex-direction: column;
@@ -24,61 +24,74 @@
             -webkit-user-select: none;
         }
 
-        /* UI 패널: 더 꽉 차고 세련되게 */
-        #ui-panel {
+        /* UI 패널 컨테이너 */
+        #ui-wrapper {
             background: #ffffff;
-            padding: 30px 60px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             z-index: 100;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* 설정창이 닫혔을 때의 상태 */
+        #ui-wrapper.hidden #ui-panel {
+            display: none;
+        }
+
+        #ui-panel {
+            padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        /* 상단 설정 그룹 */
+        /* 상단 설정 그룹: 모바일 대응 (Flex 사용) */
         .top-settings {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.5fr;
-            gap: 25px;
-            align-items: end;
+            display: flex;
+            flex-wrap: wrap; /* 모바일에서 자동 줄바꿈 */
+            gap: 15px;
         }
 
-        .control-group { display: flex; flex-direction: column; gap: 10px; }
-        label { font-weight: 800; color: #333; font-size: 15px; }
+        .control-group { 
+            flex: 1; 
+            min-width: 200px; /* 모바일에서 좁아지면 아래로 내려감 */
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+
+        label { font-weight: 800; color: #333; font-size: 14px; }
         
         input[type="text"], select { 
-            padding: 15px; border: 2px solid #e1e4e8; border-radius: 12px; 
+            padding: 12px; border: 2px solid #e1e4e8; border-radius: 10px; 
             font-size: 16px; outline: none; background: #fafafa;
         }
 
-        .color-pickers { display: flex; gap: 10px; }
-        input[type="color"] { width: 100%; height: 50px; border: none; border-radius: 8px; cursor: pointer; background: none; }
-        input[type="range"] { width: 100%; cursor: pointer; accent-color: #007bff; margin: 5px 0; }
+        .color-pickers { display: flex; gap: 8px; }
+        input[type="color"] { width: 100%; height: 45px; border: none; border-radius: 8px; cursor: pointer; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: #007bff; }
 
-        /* 추천 조합: 공간을 꽉 채우도록 수정 */
+        /* 추천 조합: 모바일에서 버튼이 너무 작아지지 않게 조정 */
         .preset-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
             padding-top: 15px;
             border-top: 1px solid #eee;
-            flex-wrap: wrap;
         }
         .preset-btn { 
-            flex: 1; /* 버튼들이 공간을 골고루 나눠가짐 */
-            min-width: 100px;
-            padding: 12px 10px; border: 1px solid #ddd; border-radius: 10px; 
-            cursor: pointer; font-weight: 900; font-size: 13px; transition: 0.2s;
+            padding: 10px 5px; border: 1px solid #ddd; border-radius: 8px; 
+            cursor: pointer; font-weight: 900; font-size: 11px; transition: 0.2s;
             text-align: center;
         }
-        .preset-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        #start-btn {
-            padding: 20px; background: #1a1a1a; color: white;
-            font-size: 22px; font-weight: 900; border: none; border-radius: 12px; cursor: pointer;
-            transition: 0.3s;
+        /* 버튼 영역 */
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
-        #start-btn:hover { background: #000; letter-spacing: 2px; }
+
+        #start-btn { flex: 3; padding: 15px; background: #1a1a1a; color: white; font-size: 18px; font-weight: 900; border: none; border-radius: 10px; cursor: pointer; }
+        #toggle-ui-btn { flex: 1; padding: 15px; background: #eee; color: #333; font-size: 14px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
 
         /* 전광판 영역 */
         #display-area {
@@ -97,71 +110,86 @@
             font-size: var(--font-size);
             font-weight: 900;
             animation: move-left var(--speed-val) linear infinite;
-            pointer-events: none;
         }
 
         @keyframes move-left {
             from { transform: translateX(100vw); }
             to { transform: translateX(-100%); }
         }
+
+        /* 모바일용 폰트 크기 조정 */
+        @media (max-width: 600px) {
+            :root { --font-size: 80px; }
+            #ui-panel { padding: 15px; }
+            .control-group { min-width: 100%; } /* 모바일은 무조건 한 줄에 하나 */
+        }
     </style>
 </head>
 <body>
 
-    <div id="ui-panel">
-        <div class="top-settings">
-            <div class="control-group">
-                <label>💬 전광판에 나올 내용</label>
-                <input type="text" id="input-text" value="환영합니다! 오늘 하루도 화이팅! 🚀">
-            </div>
-            <div class="control-group">
-                <label>🔤 글씨체</label>
-                <select id="input-font">
-                    <option value="'Malgun Gothic'">기본 고딕</option>
-                    <option value="'Gungsuh'">전통 궁서</option>
-                    <option value="'Batang'">명조체</option>
-                    <option value="cursive">부드러운체</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>🎨 직접 색상</label>
-                <div class="color-pickers">
-                    <input type="color" id="input-text-color" value="#ffff00" title="글자 색">
-                    <input type="color" id="input-bg-color" value="#000000" title="배경 색">
+    <div id="ui-wrapper">
+        <div id="ui-panel">
+            <div class="top-settings">
+                <div class="control-group">
+                    <label>💬 내용</label>
+                    <input type="text" id="input-text" value="환영합니다! 🚀">
+                </div>
+                <div class="control-group">
+                    <label>🔤 글씨체</label>
+                    <select id="input-font">
+                        <option value="'Malgun Gothic'">고딕</option>
+                        <option value="'Gungsuh'">궁서</option>
+                        <option value="cursive">필기</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>🎨 색상</label>
+                    <div class="color-pickers">
+                        <input type="color" id="input-text-color" value="#ffff00">
+                        <input type="color" id="input-bg-color" value="#000000">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>📏 크기 & ⚡ 속도</label>
+                    <input type="range" id="input-size" min="30" max="600" value="150">
+                    <input type="range" id="input-speed" min="1" max="29" value="18">
                 </div>
             </div>
-            <div class="control-group">
-                <label>📏 크기 & ⚡ 속도</label>
-                <input type="range" id="input-size" min="50" max="600" value="250">
-                <input type="range" id="input-speed" min="1" max="29" value="18">
+
+            <div class="preset-row">
+                <button class="preset-btn" style="background:#000; color:#ffff00;" onclick="setPreset('#000000', '#ffff00')">검/노</button>
+                <button class="preset-btn" style="background:#000; color:#fff;" onclick="setPreset('#000000', '#ffffff')">검/흰</button>
+                <button class="preset-btn" style="background:#00008b; color:#fff;" onclick="setPreset('#00008b', '#ffffff')">남/흰</button>
+                <button class="preset-btn" style="background:#ff0000; color:#fff;" onclick="setPreset('#ff0000', '#ffffff')">빨/흰</button>
+                <button class="preset-btn" style="background:#000; color:#0f0;" onclick="setPreset('#000000', '#00ff00')">검/연</button>
+                <button class="preset-btn" style="background:#fff; color:#f6b;" onclick="setPreset('#ffffff', '#ff69b4')">흰/핑</button>
             </div>
         </div>
-
-        <div class="preset-row">
-            <span style="font-weight:bold; color:#666; margin-right:10px;">인기 조합:</span>
-            <button class="preset-btn" style="background:#000; color:#ffff00;" onclick="setPreset('#000000', '#ffff00')">검정/노랑</button>
-            <button class="preset-btn" style="background:#000; color:#ffffff;" onclick="setPreset('#000000', '#ffffff')">검정/흰색</button>
-            <button class="preset-btn" style="background:#00008b; color:#ffffff;" onclick="setPreset('#00008b', '#ffffff')">남색/흰색</button>
-            <button class="preset-btn" style="background:#ff0000; color:#ffffff;" onclick="setPreset('#ff0000', '#ffffff')">빨강/흰색</button>
-            <button class="preset-btn" style="background:#000; color:#00ff00;" onclick="setPreset('#000000', '#00ff00')">검정/연두</button>
-            <button class="preset-btn" style="background:#ffffff; color:#ff69b4;" onclick="setPreset('#ffffff', '#ff69b4')">흰색/핑크</button>
-            <button class="preset-btn" style="background:#1a1a1a; color:#00ffff;" onclick="setPreset('#1a1a1a', '#00ffff')">검정/하늘</button>
-            <button class="preset-btn" style="background:#ffd700; color:#000;" onclick="setPreset('#ffd700', '#000000')">황금/검정</button>
+        
+        <div class="button-group" style="padding: 0 20px 20px 20px; background: white;">
+            <button id="toggle-ui-btn" onclick="toggleSettings()">⚙️ 설정 접기</button>
+            <button id="start-btn" onclick="startMarquee()">전광판 시작</button>
         </div>
-
-        <button id="start-btn" onclick="startMarquee()">전광판 시작하기 (전체화면)</button>
     </div>
 
     <div id="display-area">
-        <div id="marquee-text" oncontextmenu="return false;">환영합니다! 오늘 하루도 화이팅! 🚀</div>
+        <div id="marquee-text" oncontextmenu="return false;">환영합니다! 🚀</div>
     </div>
 
     <script>
         const root = document.documentElement;
-        const ui = document.getElementById('ui-panel');
+        const uiWrapper = document.getElementById('ui-wrapper');
+        const toggleBtn = document.getElementById('toggle-ui-btn');
         const text = document.getElementById('marquee-text');
         const area = document.getElementById('display-area');
 
+        // 설정창 접기/펴기 기능
+        function toggleSettings() {
+            uiWrapper.classList.toggle('hidden');
+            toggleBtn.innerText = uiWrapper.classList.contains('hidden') ? "⚙️ 설정 열기" : "⚙️ 설정 접기";
+        }
+
+        // 입력창 반영
         document.getElementById('input-text').addEventListener('input', (e) => text.innerText = e.target.value || ' ');
         document.getElementById('input-size').addEventListener('input', (e) => root.style.setProperty('--font-size', e.target.value + 'px'));
         document.getElementById('input-font').addEventListener('change', (e) => text.style.fontFamily = e.target.value);
@@ -192,21 +220,21 @@
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(() => {});
             }
-            ui.style.display = 'none';
+            uiWrapper.style.display = 'none';
             area.style.cursor = 'none';
         }
 
         function exitMarquee() {
-            if (ui.style.display === 'none') {
+            if (uiWrapper.style.display === 'none') {
                 if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-                ui.style.display = 'flex';
+                uiWrapper.style.display = 'block';
                 area.style.cursor = 'default';
             }
         }
 
         window.addEventListener('keydown', exitMarquee);
         area.addEventListener('mousedown', exitMarquee);
-        area.addEventListener('contextmenu', (e) => { if(ui.style.display === 'none') e.preventDefault(); });
+        area.addEventListener('touchstart', exitMarquee); // 모바일 터치 대응
     </script>
 </body>
 </html>
