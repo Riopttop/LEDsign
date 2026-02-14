@@ -21,9 +21,14 @@
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            /* 텍스트 선택 방지 */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
-        /* 세련된 UI 패널 */
+        /* UI 패널 */
         #ui-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -39,46 +44,28 @@
         .control-group { display: flex; flex-direction: column; gap: 12px; }
         label { font-weight: 700; color: #1a1a1a; font-size: 15px; display: flex; align-items: center; gap: 8px; }
         
-        /* 입력창 디자인 */
-        input[type="text"], select { 
+        input[type="text"] {
+            user-select: auto !important;
+            -webkit-user-select: auto !important;
             padding: 14px; border: 1px solid #d1d9e0; border-radius: 12px; 
-            font-size: 16px; transition: all 0.3s; background: #fff;
+            font-size: 16px; outline: none; background: #fff;
         }
-        input[type="text"]:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); outline: none; }
         
-        /* 색상 선택기 커스텀 */
         .color-pickers { display: flex; gap: 15px; }
         .color-item { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-        input[type="color"] { 
-            width: 100%; height: 45px; border: none; border-radius: 8px; cursor: pointer; background: none;
-        }
-
-        /* 슬라이더 디자인 */
+        input[type="color"] { width: 100%; height: 45px; border: none; border-radius: 8px; cursor: pointer; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: #007bff; }
 
-        /* 추천 버튼 */
         .preset-container { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; padding-top: 10px; border-top: 1px solid #eee; }
         .preset-btn { 
             padding: 10px 20px; border: 1px solid #eee; border-radius: 30px; 
             cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; background: #fff;
         }
-        .preset-btn:hover { background: #f0f0f0; transform: translateY(-2px); }
 
-        /* 실행 버튼 */
         #start-btn {
-            grid-column: 1 / -1;
-            padding: 20px;
-            background: #1a1a1a;
-            color: white;
-            font-size: 22px;
-            font-weight: 700;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
+            grid-column: 1 / -1; padding: 20px; background: #1a1a1a; color: white;
+            font-size: 22px; font-weight: 700; border: none; border-radius: 15px; cursor: pointer;
         }
-        #start-btn:hover { background: #000; transform: scale(1.01); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
         /* 전광판 영역 */
         #display-area {
@@ -97,23 +84,12 @@
             font-size: var(--font-size);
             font-weight: 900;
             animation: move-left var(--speed-val) linear infinite;
-            padding-left: 20px;
+            pointer-events: none; 
         }
 
         @keyframes move-left {
             from { transform: translateX(100vw); }
             to { transform: translateX(-100%); }
-        }
-
-        #exit-guide {
-            position: fixed;
-            bottom: 30px;
-            width: 100%;
-            text-align: center;
-            color: rgba(255,255,255,0.4);
-            font-size: 16px;
-            display: none;
-            font-weight: 300;
         }
     </style>
 </head>
@@ -141,28 +117,26 @@
 
         <div class="control-group">
             <label>📏 글자 크기</label>
-            <input type="range" id="input-size" min="50" max="500" value="200">
+            <input type="range" id="input-size" min="50" max="600" value="250">
         </div>
 
         <div class="control-group">
             <label>⚡ 이동 속도</label>
-            <input type="range" id="input-speed" min="1" max="29" value="15">
+            <input type="range" id="input-speed" min="1" max="29" value="18">
         </div>
 
         <div class="preset-container">
-            <span style="font-size:13px; font-weight:bold; margin-right:10px;">빠른 선택:</span>
-            <button class="preset-btn" style="border-left: 5px solid #ffff00;" onclick="setPreset('#000000', '#ffff00')">검정/노랑</button>
-            <button class="preset-btn" style="border-left: 5px solid #ffffff;" onclick="setPreset('#000000', '#ffffff')">검정/흰색</button>
-            <button class="preset-btn" style="border-left: 5px solid #00ff00;" onclick="setPreset('#000000', '#00ff00')">검정/연두</button>
-            <button class="preset-btn" style="border-left: 5px solid #ffffff; background:#00008b; color:#fff;" onclick="setPreset('#00008b', '#ffffff')">남색/흰색</button>
+            <button class="preset-btn" onclick="setPreset('#000000', '#ffff00')">검정/노랑</button>
+            <button class="preset-btn" onclick="setPreset('#000000', '#ffffff')">검정/흰색</button>
+            <button class="preset-btn" onclick="setPreset('#00008b', '#ffffff')">남색/흰색</button>
+            <button class="preset-btn" onclick="setPreset('#ff0000', '#ffffff')">빨강/흰색</button>
         </div>
 
         <button id="start-btn" onclick="startMarquee()">전광판 실행하기</button>
     </div>
 
     <div id="display-area">
-        <div id="marquee-text">오늘도 좋은 하루 되세요 ☀️</div>
-        <div id="exit-guide">화면을 클릭하면 다시 설정으로 돌아갑니다</div>
+        <div id="marquee-text" oncontextmenu="return false;">오늘도 좋은 하루 되세요 ☀️</div>
     </div>
 
     <script>
@@ -170,13 +144,11 @@
         const ui = document.getElementById('ui-panel');
         const text = document.getElementById('marquee-text');
         const area = document.getElementById('display-area');
-        const guide = document.getElementById('exit-guide');
 
-        // 실시간 텍스트 및 크기 반영
+        // 입력창 반영
         document.getElementById('input-text').addEventListener('input', (e) => text.innerText = e.target.value || ' ');
         document.getElementById('input-size').addEventListener('input', (e) => root.style.setProperty('--font-size', e.target.value + 'px'));
 
-        // 색상 커스텀 로직
         const textColorInput = document.getElementById('input-text-color');
         const bgColorInput = document.getElementById('input-bg-color');
 
@@ -186,13 +158,11 @@
             area.style.backgroundColor = e.target.value;
         });
 
-        // 부드러운 속도 조절
         document.getElementById('input-speed').addEventListener('input', (e) => {
             const newSpeed = 31 - e.target.value;
             root.style.setProperty('--speed-val', newSpeed + 's');
         });
 
-        // 추천 조합
         function setPreset(bg, txt) {
             root.style.setProperty('--bg-color', bg);
             root.style.setProperty('--text-color', txt);
@@ -206,7 +176,6 @@
                 document.documentElement.requestFullscreen().catch(() => {});
             }
             ui.style.display = 'none';
-            guide.style.display = 'block';
             area.style.cursor = 'none';
         }
 
@@ -214,13 +183,18 @@
             if (ui.style.display === 'none') {
                 if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
                 ui.style.display = 'grid';
-                guide.style.display = 'none';
                 area.style.cursor = 'default';
             }
         }
 
+        // 아무 키나 누르거나 클릭하면 설정창 복귀
         window.addEventListener('keydown', exitMarquee);
         area.addEventListener('mousedown', exitMarquee);
+        
+        // 실행 중 우클릭 방지
+        area.addEventListener('contextmenu', (e) => {
+            if(ui.style.display === 'none') e.preventDefault();
+        });
     </script>
 </body>
 </html>
